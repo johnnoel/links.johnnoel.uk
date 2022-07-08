@@ -18,6 +18,12 @@ class LinkRepository extends ServiceEntityRepository
         parent::__construct($registry, Link::class);
     }
 
+    public function create(Link $link): void
+    {
+        $this->_em->persist($link);
+        $this->_em->flush();
+    }
+
     /**
      * @return array<Link>
      */
