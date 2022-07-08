@@ -49,7 +49,6 @@ jobs:
     steps:
       - attach_workspace:
           at: /tmp
-      - run: sudo apt-get update && sudo apt-get install -y php8.0-sqlite3
       - run: mkdir -p /tmp/links-johnnoel-uk/var/db && touch /tmp/links-johnnoel-uk/var/db/db_test.sqlite3
       - run: bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
       - run: bin/phpunit --stop-on-failure --log-junit junitreport.xml
