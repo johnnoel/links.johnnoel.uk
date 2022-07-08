@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use App\Repository\LinkRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Ramsey\Uuid\Uuid;
 
-#[ORM\Entity]
-#[ORM\Table(name: 'categories')]
-class Category
+#[ORM\Entity(repositoryClass: LinkRepository::class)]
+#[ORM\Table(name: 'tags')]
+class Tag
 {
     #[ORM\Id]
     #[ORM\Column(type: 'guid')]
     #[Serializer\Exclude]
     private string $id;
     #[ORM\Column(type: 'string', length: 255, unique: true, nullable: false)]
-    private string $slug;
-    #[ORM\Column(type: 'string', length: 255, nullable: false)]
-    private string $name;
+    private string $tag;
     /**
      * @var Collection<int,Link>
      */
@@ -29,21 +28,15 @@ class Category
     #[Serializer\Exclude]
     private Collection $links;
 
-    public function __construct(string $name, string $slug)
+    public function __construct(string $tag)
     {
         $this->id = Uuid::uuid4()->toString();
-        $this->name = $name;
-        $this->slug = $slug;
+        $this->tag = $tag;
         $this->links = new ArrayCollection();
     }
 
-    public function getSlug(): string
+    public function getTag(): string
     {
-        return $this->slug;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
+        return $this->tag;
     }
 }

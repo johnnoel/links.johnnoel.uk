@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Tests\Feature\Controller;
 
+use App\Entity\Tag;
 use App\Factory\CategoryFactory;
 use App\Factory\LinkFactory;
+use App\Factory\TagFactory;
 use App\Tests\WebTestCase;
 use Helmich\JsonAssert\JsonAssertions;
 
@@ -25,7 +27,8 @@ class ApiControllerTest extends WebTestCase
     public function testListLinksListsLinks(): void
     {
         $client = static::createClient();
-        $link = LinkFactory::createOne();
+        $tags = TagFactory::createMany(3);
+        $link = LinkFactory::createOne([ 'tags' => $tags ]);
 
         $client->request('GET', '/api/1/links');
 
@@ -50,8 +53,6 @@ class ApiControllerTest extends WebTestCase
         $category = CategoryFactory::createOne();
 
         $client->request('GET', '/api/1/categories');
-
-        dump($client->getResponse()->getContent());
 
         $this->assertResponseIsSuccessful();
         $json = $client->getResponse()->getContent();
