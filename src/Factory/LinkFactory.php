@@ -6,9 +6,9 @@ namespace App\Factory;
 
 use App\Entity\Link;
 use App\Repository\LinkRepository;
-use Zenstruck\Foundry\RepositoryProxy;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\Proxy;
+use Zenstruck\Foundry\RepositoryProxy;
 
 /**
  * @extends ModelFactory<Link>
