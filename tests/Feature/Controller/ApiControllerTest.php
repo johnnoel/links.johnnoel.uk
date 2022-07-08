@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Feature\Controller;
 
-use App\Entity\Tag;
 use App\Factory\CategoryFactory;
 use App\Factory\LinkFactory;
 use App\Factory\TagFactory;
@@ -51,6 +50,7 @@ class ApiControllerTest extends WebTestCase
         ], json_encode($jsonData));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertJson($client->getResponse()->getContent());
     }
 
     public function createLinkProvider(): array
@@ -114,5 +114,27 @@ class ApiControllerTest extends WebTestCase
         $json = $client->getResponse()->getContent();
         $this->assertJson($json);
         $this->assertJsonValueEquals($json, '$[0].name', $category->getName());
+    }
+
+    /**
+     * @dataProvider createCategoryProvider
+     */
+    public function testCreateCategory(array $jsonData): void
+    {
+        $client = static::createClient();
+        $client->request('POST', '/api/1/categories', [], [], [
+            'PHP_AUTH_USER' => 'johnnoel',
+            'PHP_AUTH_PW' => 'johnnoel',
+        ], json_encode($jsonData));
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertJson($client->getResponse()->getContent());
+    }
+
+    public function createCategoryProvider(): array
+    {
+        return [
+            'name' => [ [ 'name' => 'Test Category' ] ],
+        ];
     }
 }

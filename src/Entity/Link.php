@@ -26,27 +26,28 @@ class Link
     /**
      * @var Collection<int,Category>
      */
-    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'links')]
+    #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'links', cascade: [ 'persist', 'remove' ])]
     #[ORM\JoinTable(name: 'categories2links')]
-    #[Serializer\Exclude]
+    #[Serializer\Type('ArrayCollection<Category>')]
     private Collection $categories;
     /**
      * @var Collection<int,Tag>
      */
-    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'links')]
+    #[ORM\ManyToMany(targetEntity: Tag::class, inversedBy: 'links', cascade: [ 'persist', 'remove' ])]
     #[ORM\JoinTable(name: 'tags2links')]
     #[Serializer\Exclude]
     private Collection $tags;
 
     /**
+     * @param array<Category> $categories
      * @param array<Tag> $tags
      */
-    public function __construct(string $url, array $tags = [])
+    public function __construct(string $url, array $categories = [], array $tags = [])
     {
         $this->id = Uuid::uuid4()->toString();
         $this->url = $url;
         $this->created = new DateTimeImmutable('now');
-        $this->categories = new ArrayCollection();
+        $this->categories = new ArrayCollection($categories);
         $this->tags = new ArrayCollection($tags);
     }
 

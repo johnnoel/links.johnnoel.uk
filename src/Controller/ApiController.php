@@ -7,6 +7,8 @@ namespace App\Controller;
 use App\Entity\Category;
 use App\Entity\Link;
 use App\Form\Model\LinkModel;
+use App\Message\CreateCategory;
+use App\Message\CreateLink;
 use App\Repository\CategoryRepository;
 use App\Repository\LinkRepository;
 use JMS\Serializer\Exception\Exception;
@@ -18,17 +20,23 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\HandleTrait;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/1/', name: 'api_', defaults: [ '_format' => 'json' ])]
 class ApiController extends AbstractController
 {
+    use HandleTrait;
+
     public function __construct(
         private readonly LinkRepository $linkRepository,
         private readonly CategoryRepository $categoryRepository,
-        private readonly SerializerInterface $serializer
+        private readonly SerializerInterface $serializer,
+        MessageBusInterface $messageBus
     ) {
+        $this->messageBus = $messageBus;
     }
 
     #[Route('links', name: 'links', methods: [ 'GET' ])]
@@ -56,6 +64,7 @@ class ApiController extends AbstractController
     public function createLink(Request $request, ValidatorInterface $validator): Response
     {
         try {
+            /** @var LinkModel $linkModel */
             $linkModel = $this->serializer->deserialize($request->getContent(), LinkModel::class, 'json');
         } catch (Exception $e) {
             $serialized = $this->serializer->serialize($e, 'json');
@@ -71,7 +80,10 @@ class ApiController extends AbstractController
             return new JsonResponse($serialized, Response::HTTP_BAD_REQUEST, [], true);
         }
 
-        return new JsonResponse([], Response::HTTP_CREATED);
+        $link = $this->handle(new CreateLink($linkModel->url, $linkModel->categories, $linkModel->tags));
+        $serialized = $this->serializer->serialize($link, 'json');
+
+        return new JsonResponse($serialized, Response::HTTP_CREATED, [], true);
     }
 
     #[Route('categories', name: 'categories', methods: [ 'GET' ])]
@@ -90,5 +102,15 @@ class ApiController extends AbstractController
         $serialized = $this->serializer->serialize($categories, 'json');
 
         return new JsonResponse($serialized, Response::HTTP_OK, [], true);
+    }
+
+    #[Route('categories', name: 'categories_create', methods: [ 'POST' ])]
+    #[OA\Tag('categories')]
+    public function createCategory(Request $request): Response
+    {
+        $category = $this->handle(new CreateCategory('Doot'));
+        $serialized = $this->serializer->serialize($category, 'json');
+
+        return new JsonResponse($serialized, Response::HTTP_CREATED, [], true);
     }
 }
