@@ -40,7 +40,7 @@ class MakeUserCommand extends Command
         $email = $input->getArgument('email');
         $password = $io->askHidden('Password');
 
-        $this->handle(new CreateUser($email, $password));
+        $this->handle(new CreateUser(strval($email), strval($password)));
 
         $io->success('Successfully created new user ' . $email);
 
