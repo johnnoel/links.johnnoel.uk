@@ -4,19 +4,22 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users:
-            memory:
-                users:
-                    johnnoel: { password: '$2y$13$i7LWCHOhd/ufTess9aDYkehijFg1pvdo/9/EFKCJmCWqqiXtGE6BS', roles: [ 'ROLE_USER' ]}
+        app:
+            entity:
+                class: App\Entity\User
+                property: email
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             lazy: true
-            provider: users
-            http_basic:
-                realm: Restricted
+            provider: app
+            form_login:
+                login_path: login
+                check_path: login
+                enable_csrf: true
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall

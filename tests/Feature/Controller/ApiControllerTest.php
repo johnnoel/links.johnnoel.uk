@@ -7,6 +7,7 @@ namespace App\Tests\Feature\Controller;
 use App\Factory\CategoryFactory;
 use App\Factory\LinkFactory;
 use App\Factory\TagFactory;
+use App\Factory\UserFactory;
 use App\Tests\WebTestCase;
 use Helmich\JsonAssert\JsonAssertions;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,10 +45,9 @@ class ApiControllerTest extends WebTestCase
     public function testCreateLink(array $jsonData): void
     {
         $client = static::createClient();
-        $client->request('POST', '/api/1/links', [], [], [
-            'PHP_AUTH_USER' => 'johnnoel',
-            'PHP_AUTH_PW' => 'johnnoel',
-        ], json_encode($jsonData));
+        $user = UserFactory::createOne();
+        $client->loginUser($user->object());
+        $client->request('POST', '/api/1/links', [], [], [], json_encode($jsonData));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertJson($client->getResponse()->getContent());
@@ -73,10 +73,9 @@ class ApiControllerTest extends WebTestCase
     public function testCreateLinkFails(array $jsonData, string $errorMessage): void
     {
         $client = static::createClient();
-        $client->request('POST', '/api/1/links', [], [], [
-            'PHP_AUTH_USER' => 'johnnoel',
-            'PHP_AUTH_PW' => 'johnnoel',
-        ], json_encode($jsonData));
+        $user = UserFactory::createOne();
+        $client->loginUser($user->object());
+        $client->request('POST', '/api/1/links', [], [], [], json_encode($jsonData));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
         $this->assertStringContainsString($errorMessage, $client->getResponse()->getContent());
@@ -122,10 +121,9 @@ class ApiControllerTest extends WebTestCase
     public function testCreateCategory(array $jsonData): void
     {
         $client = static::createClient();
-        $client->request('POST', '/api/1/categories', [], [], [
-            'PHP_AUTH_USER' => 'johnnoel',
-            'PHP_AUTH_PW' => 'johnnoel',
-        ], json_encode($jsonData));
+        $user = UserFactory::createOne();
+        $client->loginUser($user->object());
+        $client->request('POST', '/api/1/categories', [], [], [], json_encode($jsonData));
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertJson($client->getResponse()->getContent());
