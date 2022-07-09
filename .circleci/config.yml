@@ -45,10 +45,11 @@ jobs:
       - image: cimg/php:8.1
         environment:
           APP_ENV: test
-          DATABASE_URL: sqlite:////tmp/links-johnnoel-uk/var/db/test.sqlite3
+          DATABASE_URL: sqlite:////tmp/links-johnnoel-uk/var/db/test.sqlite
     steps:
       - attach_workspace:
           at: /tmp
+      - run: mkdir -p /tmp/links-johnnoel-uk/var/db && touch /tmp/links-johnnoel-uk/var/db/test.sqlite
       - run: bin/phpunit --stop-on-failure --log-junit junitreport.xml
       - store_test_results:
           path: /tmp/links-johnnoel-uk/junitreport.xml
