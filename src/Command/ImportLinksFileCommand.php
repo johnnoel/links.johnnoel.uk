@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Message\CreateUser;
+use App\Message\ImportLinksFile;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,10 +15,10 @@ use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsCommand(
-    name: 'persist:user',
+    name: 'import:links',
     description: 'Persist a new user to the database',
 )]
-class MakeUserCommand extends Command
+class ImportLinksFileCommand extends Command
 {
     use HandleTrait;
 
@@ -31,18 +31,17 @@ class MakeUserCommand extends Command
 
     protected function configure(): void
     {
-        $this->addArgument('email', InputArgument::REQUIRED, 'New user\'s email address');
+        $this->addArgument('file', InputArgument::REQUIRED, 'Path to the file to import');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $email = $input->getArgument('email');
-        $password = $io->askHidden('Password');
+        $path = $input->getArgument('file');
 
-        $this->handle(new CreateUser(strval($email), strval($password)));
+        $importCount = $this->handle(new ImportLinksFile(strval($path)));
 
-        $io->success('Successfully created new user ' . $email);
+        $io->success('Successfully imported ' . $importCount . ' links from ' . $path);
 
         return Command::SUCCESS;
     }

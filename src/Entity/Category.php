@@ -37,6 +37,11 @@ class Category
         $this->links = new ArrayCollection();
     }
 
+    public static function createSlug(string $name): string
+    {
+        return strval(preg_replace('/\s+/u', '-', mb_strtolower($name)));
+    }
+
     public function getSlug(): string
     {
         return $this->slug;

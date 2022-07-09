@@ -19,7 +19,7 @@ class CreateCategoryHandler
 
     public function __invoke(CreateCategory $message): Category
     {
-        $slug = strval(preg_replace('/\s+/u', '-', mb_strtolower($message->getName())));
+        $slug = Category::createSlug($message->getName());
         $originalSlug = $slug;
         $counter = 1;
 

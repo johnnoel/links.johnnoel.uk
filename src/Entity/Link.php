@@ -64,6 +64,11 @@ class Link
         return $this->categories;
     }
 
+    public function overrideCreated(DateTimeImmutable $created): void
+    {
+        $this->created = $created;
+    }
+
     /**
      * @return array<string>
      */
