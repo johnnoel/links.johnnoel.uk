@@ -85,12 +85,12 @@ class ApiControllerTest extends WebTestCase
     public function createLinkFailsProvider(): array
     {
         return [
-            'nothing' => [ [], 'This value should not be blank' ],
+            'nothing' => [ [], 'Array value found, but an object is required' ],
             'bad url' => [ [ 'url' => '"£$%this isnt a url!' ], 'This value is not a valid URL' ],
-            'bad tags' => [ [ 'url' => 'https://links.johnnoel.uk', 'tags' => 123 ], 'Expected array, but got integer' ],
-            'bad tags 2' => [ [ 'url' => 'https://links.johnnoel.uk', 'tags' => [ [ 'another array' ] ] ], 'Cannot convert value of type \\"array\\"' ],
-            'bad categories' => [ [ 'url' => 'https://links.johnnoel.uk', 'categories' => 123 ], 'Expected array, but got integer' ],
-            'bad categories 2' => [ [ 'url' => 'https://links.johnnoel.uk', 'categories' => [ [ 'another array' ] ] ], 'Cannot convert value of type \\"array\\"' ],
+            'bad tags' => [ [ 'url' => 'https://links.johnnoel.uk', 'tags' => 123 ], 'Integer value found, but an array is required' ],
+            'bad tags 2' => [ [ 'url' => 'https://links.johnnoel.uk', 'tags' => [ [ 'another array' ] ] ], 'Array value found, but a string is required' ],
+            'bad categories' => [ [ 'url' => 'https://links.johnnoel.uk', 'categories' => 123 ], 'Integer value found, but an array is required' ],
+            'bad categories 2' => [ [ 'url' => 'https://links.johnnoel.uk', 'categories' => [ [ 'another array' ] ] ], 'Array value found, but a string is required' ],
         ];
     }
 

@@ -1,0 +1,18 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "$id": "https://links.johnnoel.uk/schema/create-category",
+    "title": "Create a category",
+    "description": "",
+    "type": "object",
+    "required": [ "name" ],
+    "properties": {
+        "name": {
+            "type": "string",
+            "maxLength": 255
+        },
+        "slug": {
+            "type": "string",
+            "maxLength": 255
+        }
+    }
+}

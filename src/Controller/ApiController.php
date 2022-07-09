@@ -7,11 +7,11 @@ namespace App\Controller;
 use App\Entity\Category;
 use App\Entity\Link;
 use App\Form\Model\LinkModel;
+use App\JsonValidator\ValidateJson;
 use App\Message\CreateCategory;
 use App\Message\CreateLink;
 use App\Repository\CategoryRepository;
 use App\Repository\LinkRepository;
-use JMS\Serializer\Exception\Exception;
 use JMS\Serializer\SerializerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -61,17 +61,11 @@ class ApiController extends AbstractController
     //#[OA\RequestBody(new Model(type: LinkModel::class))]
     #[OA\Tag('links')]
     #[Security(name: 'HttpBasic')]
+    #[ValidateJson(path: 'create-link.json')]
     public function createLink(Request $request, ValidatorInterface $validator): Response
     {
-        try {
-            /** @var LinkModel $linkModel */
-            $linkModel = $this->serializer->deserialize($request->getContent(), LinkModel::class, 'json');
-        } catch (Exception $e) {
-            $serialized = $this->serializer->serialize($e, 'json');
-
-            return new JsonResponse($serialized, Response::HTTP_BAD_REQUEST, [], true);
-        }
-
+        /** @var LinkModel $linkModel */
+        $linkModel = $this->serializer->deserialize($request->getContent(), LinkModel::class, 'json');
         $errors = $validator->validate($linkModel);
 
         if (count($errors) > 0) {
@@ -106,9 +100,10 @@ class ApiController extends AbstractController
 
     #[Route('categories', name: 'categories_create', methods: [ 'POST' ])]
     #[OA\Tag('categories')]
-    public function createCategory(Request $request): Response
+    #[ValidateJson(path: 'create-category.json')]
+    public function createCategory(object $validJson): Response
     {
-        $category = $this->handle(new CreateCategory('Doot'));
+        $category = $this->handle(new CreateCategory($validJson->name));
         $serialized = $this->serializer->serialize($category, 'json');
 
         return new JsonResponse($serialized, Response::HTTP_CREATED, [], true);

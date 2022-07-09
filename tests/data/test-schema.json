@@ -1,0 +1,13 @@
+{
+    "$schema": "http://json-schema.org/schema#",
+    "$id": "https://links.johnnoel.uk/schema/test",
+    "title": "Test schema",
+    "description": "",
+    "type": "object",
+    "required": [ "test" ],
+    "properties": {
+        "test": {
+            "type": "string"
+        }
+    }
+}
