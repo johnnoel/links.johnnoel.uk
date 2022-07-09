@@ -54,17 +54,67 @@ jobs:
       - store_test_results:
           path: /tmp/links-johnnoel-uk/junitreport.xml
 
+    build:
+        working_directory: /tmp
+        docker:
+            - image: cimg/php:8.1
+              environment:
+                  NODE_ENV: production
+                  APP_ENV: prod
+        steps:
+            - attach_workspace:
+                  at: /tmp
+            - run: composer install --working-dir /tmp/links-johnnoel-uk --no-interaction --no-dev --no-progress --no-scripts
+            - run: composer dump-autoload --working-dir /tmp/links-johnnoel-uk --no-interaction --no-dev --optimize
+            - run: rm -rf /tmp/links-johnnoel-uk/var/log/* /tmp/johnnoel-uk/var/cache/*
+            - run: tar cjf links-johnnoel-uk.tar.bz2 -C /tmp/links-johnnoel-uk/ .
+            - store_artifacts:
+                  path: /tmp/links-johnnoel-uk.tar.bz2
+
+    deploy:
+        working_directory: /tmp/links-johnnoel-uk
+        docker:
+            - image: johnnoel/php:7.4
+        steps:
+            - attach_workspace:
+                  at: /tmp
+            - add_ssh_keys:
+                  fingerprints:
+                      - "0a:3e:5d:cc:d1:21:30:32:19:f9:33:3b:77:a1:b0:18"
+            - run: doctl auth init --access-token "${DIGITALOCEAN_API_KEY}"
+            - run: echo "export EXTERNAL_IP=$(wget -qO- http://checkip.amazonaws.com/)" >> $BASH_ENV
+            - run: doctl compute firewall add-rules --inbound-rules "protocol:tcp,ports:22,address:${EXTERNAL_IP}/32" "${DIGITALOCEAN_FIREWALL_ID}"
+            - run: ssh-keyscan -H 67.207.69.0 >> ~/.ssh/known_hosts
+            - run: dep -f config/deploy.php deploy "https://circleci.com/api/v1.1/project/github/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/latest/artifacts" "${CIRCLE_TOKEN}"
+            - run: doctl compute firewall remove-rules --inbound-rules "protocol:tcp,ports:22,address:${EXTERNAL_IP}/32" "${DIGITALOCEAN_FIREWALL_ID}"
+
 workflows:
-  version: 2
-  install-and-test:
-    jobs:
-      - install
-      - coding-standards:
-          requires:
+    version: 2
+    install-and-test:
+        jobs:
             - install
-      - static-analysis:
-          requires:
-            - install
-      - test:
-          requires:
-            - install
+            - coding-standards:
+                  requires:
+                      - install
+            - static-analysis:
+                  requires:
+                      - install
+            - test:
+                  requires:
+                      - install
+            - build:
+                  requires:
+                      - coding-standards
+                      - static-analysis
+                      - test
+                  filters:
+                      branches:
+                          only: main
+            - deploy:
+                  requires:
+                      - build
+                  filters:
+                      branches:
+                          only: main
+                  context:
+                      - Deployment
