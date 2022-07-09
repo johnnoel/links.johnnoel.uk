@@ -48,4 +48,7 @@ task('deploy:update_code', function () {
 });
 task('deploy:vendors', function () { });
 
+// Migrate database before symlink new release.
+after('deploy:symlink', 'database:migrate');
+
 after('deploy:failed', 'deploy:unlock');
