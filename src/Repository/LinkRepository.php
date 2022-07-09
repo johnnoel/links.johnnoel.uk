@@ -29,6 +29,6 @@ class LinkRepository extends ServiceEntityRepository
      */
     public function fetchLinks(): array
     {
-        return $this->findAll();
+        return $this->findBy([], [ 'created' => 'DESC' ]);
     }
 }

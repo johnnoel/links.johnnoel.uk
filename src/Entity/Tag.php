@@ -24,7 +24,7 @@ class Tag
     /**
      * @var Collection<int,Link>
      */
-    #[ORM\ManyToMany(targetEntity: Link::class, mappedBy: 'categories')]
+    #[ORM\ManyToMany(targetEntity: Link::class, mappedBy: 'tags')]
     #[Serializer\Exclude]
     private Collection $links;
 

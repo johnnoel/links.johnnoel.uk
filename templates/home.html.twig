@@ -1,5 +1,11 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-Hi there
+    <h1>links.johnnoel.uk</h1>
+
+    <ul>
+        {% for link in links %}
+            <li><a href="{{ link.url }}" rel="nofollow noopener">{{ link.url }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock body %}
