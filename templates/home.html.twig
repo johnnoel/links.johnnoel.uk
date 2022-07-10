@@ -5,7 +5,12 @@
 
     <ul>
         {% for link in links %}
-            <li><a href="{{ link.url }}" rel="nofollow noopener">{{ link.url }}</a></li>
+            <li>
+                <a href="{{ link.url }}" rel="nofollow noopener">{{ link.title|default(link.url) }}</a>{% if link.title is not empty %} ({{ link.domain }}){% endif %}
+                {% if link.description is not empty %}
+                    <br>{{ link.description }}
+                {% endif %}
+            </li>
         {% endfor %}
     </ul>
 {% endblock body %}

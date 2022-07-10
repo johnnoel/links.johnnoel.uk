@@ -29,6 +29,13 @@ class LinkRepository extends ServiceEntityRepository
      */
     public function fetchLinks(): array
     {
-        return $this->findBy([], [ 'created' => 'DESC' ]);
+        $qb = $this->createQueryBuilder('l');
+        $qb->addSelect([ 'lm' ])
+            ->leftJoin('l.metadata', 'lm')
+            ->orderBy('l.created', 'DESC')
+        ;
+
+        /** @var array<Link> */
+        return $qb->getQuery()->getResult();
     }
 }

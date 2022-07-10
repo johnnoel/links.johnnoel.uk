@@ -23,6 +23,8 @@ class Link
     private string $url;
     #[ORM\Column(type: 'datetime_immutable', nullable: false)]
     private DateTimeImmutable $created;
+    #[ORM\OneToOne(mappedBy: 'link', targetEntity: LinkMetadata::class, cascade: [ 'persist', 'remove' ])]
+    private ?LinkMetadata $metadata = null;
     /**
      * @var Collection<int,Category>
      */
@@ -69,10 +71,37 @@ class Link
         $this->created = $created;
     }
 
+    public function attachMetadata(LinkMetadata $metadata): void
+    {
+        $this->metadata = $metadata;
+    }
+
+    public function hasMetadata(): bool
+    {
+        return $this->metadata !== null;
+    }
+
+    public function getDomain(): string
+    {
+        return strval(parse_url($this->url, PHP_URL_HOST));
+    }
+
+    #[Serializer\VirtualProperty]
+    public function getTitle(): ?string
+    {
+        return ($this->metadata !== null) ? $this->metadata->getTitle() : null;
+    }
+
+    #[Serializer\VirtualProperty]
+    public function getDescription(): ?string
+    {
+        return ($this->metadata !== null) ? $this->metadata->getDescription() : null;
+    }
+
     /**
      * @return array<string>
      */
-    #[Serializer\VirtualProperty()]
+    #[Serializer\VirtualProperty]
     #[Serializer\SerializedName('tags')]
     public function getTagStrings(): array
     {

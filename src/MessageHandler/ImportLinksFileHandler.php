@@ -6,6 +6,7 @@ namespace App\MessageHandler;
 
 use App\Entity\Category;
 use App\Entity\Link;
+use App\Entity\LinkMetadata;
 use App\Message\ImportLinksFile;
 use App\Repository\CategoryRepository;
 use App\Repository\LinkRepository;
@@ -38,14 +39,25 @@ class ImportLinksFileHandler
 
         $imported = 0;
 
-        /** @var array{url: string, folder: string, tags: string, created: string} $record */
+        /** @var array{
+         *     title: string,
+         *     description: string,
+         *     url: string,
+         *     folder: string,
+         *     tags: string,
+         *     created: string
+         * } $record
+         */
         foreach ($csv->getRecords() as $record) {
             $url = $record['url'];
             $tags = array_filter(array_map('trim', explode(',', $record['tags'])));
             $tags = (count($tags) > 0) ? $this->tagRepository->fetchAndCreateTags($tags) : [];
             $created = DateTimeImmutable::createFromFormat(DateTimeInterface::RFC3339_EXTENDED, $record['created']);
+            $title = html_entity_decode($record['title']);
 
             $link = new Link($url, [ $this->getCategory($record['folder']) ], $tags);
+            $link->attachMetadata(new LinkMetadata($link, $title, $record['description']));
+
             if ($created !== false) {
                 $link->overrideCreated($created);
             }
