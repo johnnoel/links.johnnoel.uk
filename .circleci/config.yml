@@ -3,7 +3,7 @@ jobs:
     install:
         working_directory: /tmp/links-johnnoel-uk
         docker:
-            - image: cimg/php:8.1
+            - image: cimg/php:8.1-node
         steps:
             - checkout
             - run: sudo composer self-update
@@ -11,11 +11,20 @@ jobs:
                   keys:
                       - composer-v1-{{ checksum "composer.lock" }}
                       - composer-v1-
+            - restore_cache:
+                  keys:
+                      - npm-v1-{{ checksum "package-lock.json" }}
+                      - npm-v1-
             - run: composer install --no-interaction --no-progress
+            - run: npm install
             - save_cache:
                   key: composer-v1-{{ checksum "composer.lock" }}
                   paths:
                       - vendor
+            - save_cache:
+                  key: npm-v1-{{ checksum "package-lock.json" }}
+                  paths:
+                      - node_modules
             - persist_to_workspace:
                   root: /tmp/
                   paths:

@@ -1,0 +1,33 @@
+{
+  "name": "links.johnnoel.uk",
+  "version": "0.0.1",
+  "description": "Stores and organises links and bookmarks",
+  "main": "assets/js/index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/johnnoel/links.johnnoel.uk.git"
+  },
+  "keywords": [
+    "links",
+    "bookmarks",
+    "php",
+    "symfony"
+  ],
+  "author": "John Noel <chaostangent@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/johnnoel/links.johnnoel.uk/issues"
+  },
+  "homepage": "https://github.com/johnnoel/links.johnnoel.uk#readme",
+  "dependencies": {
+    "@mozilla/readability": "^0.4.2",
+    "axios": "^0.27.2",
+    "jsdom": "^20.0.0"
+  }
+}
