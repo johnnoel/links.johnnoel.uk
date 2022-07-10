@@ -1,3 +1,8 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+        envelope:
+            sender: '%env(EMAIL_FROM)%'
+        headers:
+            from: 'links.johnnoel.uk <%env(EMAIL_FROM)%>'
+            reply-to: '%env(EMAIL_REPLY_TO)%'

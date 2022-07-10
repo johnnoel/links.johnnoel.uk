@@ -25,3 +25,8 @@ services:
     App\JsonValidator\JsonValidator:
         arguments:
             $schemaRoot: '%kernel.project_dir%/schemas/'
+
+    App\MessageHandler\FetchReadableLinkContentHandler:
+        arguments:
+            $scriptPath: '%kernel.project_dir%/assets/js/index.js'
+            $nodeExecutable: '/usr/bin/node'
