@@ -20,8 +20,8 @@ class LinkMetadata
     private Link $link;
     #[ORM\Column(type: 'text')]
     private string $title;
-    #[ORM\Column(type: 'text')]
-    private string $description;
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description;
     /**
      * @var array<string,mixed>
      */
@@ -33,7 +33,7 @@ class LinkMetadata
     /**
      * @param array<string,mixed> $extra
      */
-    public function __construct(Link $link, string $title, string $description, array $extra = [])
+    public function __construct(Link $link, string $title, ?string $description, array $extra = [])
     {
         $this->id = Uuid::uuid4()->toString();
         $this->link = $link;
@@ -48,7 +48,7 @@ class LinkMetadata
         return $this->title;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }

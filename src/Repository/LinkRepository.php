@@ -24,6 +24,12 @@ class LinkRepository extends ServiceEntityRepository
         $this->_em->flush();
     }
 
+    public function update(Link $link): void
+    {
+        $this->_em->persist($link);
+        $this->_em->flush();
+    }
+
     /**
      * @return array<Link>
      */
