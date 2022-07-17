@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <h1>{{ form_type }} link</h1>
+    {{ form_start(form) }}
+    {{ form_row(form.url) }}
+    {{ form_row(form.isPublic) }}
+    {{ form_rest(form) }}
+    <button type="submit">{{ form_type }} link</button>
+    {{ form_end(form) }}
+{% endblock body %}

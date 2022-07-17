@@ -105,7 +105,7 @@ class ApiControllerTest extends WebTestCase
     {
         return [
             'nothing' => [ [], 'Array value found, but an object is required' ],
-            'bad url' => [ [ 'url' => '"£$%this isnt a url!' ], 'This value is not a valid URL' ],
+            'bad url' => [ [ 'url' => '"£$%this isnt a url!' ], 'URL must begin with http or https' ],
             'bad tags' => [ [ 'url' => 'https://links.johnnoel.uk', 'tags' => 123 ], 'Integer value found, but an array is required' ],
             'bad tags 2' => [ [ 'url' => 'https://links.johnnoel.uk', 'tags' => [ [ 'another array' ] ] ], 'Array value found, but a string is required' ],
             'bad categories' => [ [ 'url' => 'https://links.johnnoel.uk', 'categories' => 123 ], 'Integer value found, but an array is required' ],

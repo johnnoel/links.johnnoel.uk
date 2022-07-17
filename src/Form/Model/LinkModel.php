@@ -11,8 +11,9 @@ class LinkModel
 {
     #[Serializer\Type('string')]
     #[Assert\NotBlank]
-    #[Assert\Url(protocols: [ 'http', 'https' ])]
-    public string $url;
+    #[Assert\Url(message: 'URL must begin with http or https', protocols: [ 'http', 'https' ])]
+    public ?string $url = null;
+    public bool $isPublic;
     /**
      * @var array<string>
      */
@@ -21,7 +22,7 @@ class LinkModel
     #[Assert\All([
         new Assert\Type('string'),
     ])]
-    public array $categories = [];
+    public ?array $categories = null;
     /**
      * @var array<string>
      */
@@ -30,5 +31,5 @@ class LinkModel
     #[Assert\All([
         new Assert\Type('string'),
     ])]
-    public array $tags = [];
+    public ?array $tags = null;
 }

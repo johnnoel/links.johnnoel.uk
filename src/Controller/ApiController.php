@@ -74,7 +74,9 @@ class ApiController extends AbstractController
             return new JsonResponse($serialized, Response::HTTP_BAD_REQUEST, [], true);
         }
 
-        $link = $this->handle(new CreateLink($linkModel->url, $linkModel->categories, $linkModel->tags));
+        $link = $this->handle(
+            new CreateLink(strval($linkModel->url), $linkModel->categories ?? [], $linkModel->tags ?? [])
+        );
         $serialized = $this->serializer->serialize($link, 'json');
 
         return new JsonResponse($serialized, Response::HTTP_CREATED, [], true);
