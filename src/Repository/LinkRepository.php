@@ -33,13 +33,19 @@ class LinkRepository extends ServiceEntityRepository
     /**
      * @return array<Link>
      */
-    public function fetchLinks(): array
+    public function fetchLinks(bool $publicOnly = true): array
     {
         $qb = $this->createQueryBuilder('l');
         $qb->addSelect([ 'lm' ])
             ->leftJoin('l.metadata', 'lm')
             ->orderBy('l.created', 'DESC')
         ;
+
+        if ($publicOnly) {
+            $qb->where($qb->expr()->eq('l.isPublic', ':is_public'))
+                ->setParameter('is_public', true)
+            ;
+        }
 
         /** @var array<Link> */
         return $qb->getQuery()->getResult();

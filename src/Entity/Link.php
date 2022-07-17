@@ -23,6 +23,8 @@ class Link
     private string $url;
     #[ORM\Column(type: 'datetime_immutable', nullable: false)]
     private DateTimeImmutable $created;
+    #[ORM\Column(type: 'boolean', options: [ 'default' => false ])]
+    private bool $isPublic = false;
     #[ORM\OneToOne(mappedBy: 'link', targetEntity: LinkMetadata::class, cascade: [ 'persist', 'remove' ])]
     private ?LinkMetadata $metadata = null;
     /**
@@ -44,10 +46,11 @@ class Link
      * @param array<Category> $categories
      * @param array<Tag> $tags
      */
-    public function __construct(string $url, array $categories = [], array $tags = [])
+    public function __construct(string $url, array $categories = [], array $tags = [], bool $isPublic = false)
     {
         $this->id = Uuid::uuid4()->toString();
         $this->url = $url;
+        $this->isPublic = $isPublic;
         $this->created = new DateTimeImmutable('now');
         $this->categories = new ArrayCollection($categories);
         $this->tags = new ArrayCollection($tags);
@@ -56,6 +59,11 @@ class Link
     public function getUrl(): string
     {
         return $this->url;
+    }
+
+    public function isPublic(): bool
+    {
+        return $this->isPublic;
     }
 
     /**

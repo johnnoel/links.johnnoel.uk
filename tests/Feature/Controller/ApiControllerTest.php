@@ -25,17 +25,37 @@ class ApiControllerTest extends WebTestCase
         $this->assertJson($client->getResponse()->getContent());
     }
 
-    public function testListLinksListsLinks(): void
+    public function testListLinksListsPublicLinks(): void
     {
         $client = static::createClient();
         $tags = TagFactory::createMany(3);
-        $link = LinkFactory::createOne([ 'tags' => $tags ]);
+        $link = LinkFactory::createOne([ 'isPublic' => true, 'tags' => $tags ]);
 
         $client->request('GET', '/api/1/links');
 
         $this->assertResponseIsSuccessful();
         $json = $client->getResponse()->getContent();
         $this->assertJson($json);
+        $this->assertJsonValueEquals($json, '$[0].url', $link->getUrl());
+    }
+
+    public function testListLinksOnlyListsPrivateLinksWhenLoggedIn(): void
+    {
+        $client = static::createClient();
+        $link = LinkFactory::createOne([ 'isPublic' => false ]);
+
+        $client->request('GET', '/api/1/links');
+
+        $this->assertResponseIsSuccessful();
+        $json = $client->getResponse()->getContent();
+        $this->assertJson($json);
+        $this->assertSame('[]', $json);
+
+        $user = UserFactory::createOne();
+        $client->loginUser($user->object());
+
+        $client->request('GET', '/api/1/links');
+        $json = $client->getResponse()->getContent();
         $this->assertJsonValueEquals($json, '$[0].url', $link->getUrl());
     }
 

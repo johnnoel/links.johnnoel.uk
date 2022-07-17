@@ -18,7 +18,7 @@ class DefaultController extends AbstractController
     #[Route('/', name: 'home', methods: [ 'GET' ])]
     public function home(): Response
     {
-        $links = $this->linkRepository->fetchLinks();
+        $links = $this->linkRepository->fetchLinks(publicOnly: $this->getUser() === null);
 
         return $this->render('home.html.twig', [
             'links' => $links,

@@ -51,7 +51,7 @@ class ApiController extends AbstractController
     #[OA\Tag('links')]
     public function listLinks(): Response
     {
-        $links = $this->linkRepository->fetchLinks();
+        $links = $this->linkRepository->fetchLinks(publicOnly: $this->getUser() === null);
         $serialized = $this->serializer->serialize($links, 'json');
 
         return new JsonResponse($serialized, Response::HTTP_OK, [], true);
