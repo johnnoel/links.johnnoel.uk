@@ -33,10 +33,10 @@ class CategoryRepository extends ServiceEntityRepository
         $rsm = new ResultSetMappingBuilder($this->_em);
         $rsm->addRootEntityFromClassMetadata(Category::class, 'c');
         $rsm->addScalarResult('link_count', 'link_count');
-        $selectClause = $rsm->generateSelectClause('c', 'c');
+        $selectClause = $rsm->generateSelectClause([ 'c' => 'c' ]);
 
         $params = [];
-        $sql = 'SELECT ' . $selectClause . ', COUNT(c2l.link_id)
+        $sql = 'SELECT ' . $selectClause . ', COUNT(c2l.link_id) AS link_count
             FROM categories c
             JOIN categories2links c2l ON c2l.category_id = c.id
         ';
@@ -57,8 +57,10 @@ class CategoryRepository extends ServiceEntityRepository
 
         $query = $this->_em->createNativeQuery($sql, $rsm);
         $query->setParameters($params);
+        /** @var array<array{ 0: Category, link_count: int }> $result */
+        $result = $query->getResult();
 
-        return array_map(fn (array $row): Category => $row[0], $query->getResult());
+        return array_map(fn (array $row): Category => $row[0], $result);
     }
 
     /**

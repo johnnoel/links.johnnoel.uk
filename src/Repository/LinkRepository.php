@@ -72,11 +72,10 @@ class LinkRepository extends ServiceEntityRepository
 
         $query = $this->_em->createNativeQuery($sql, $rsm);
         $query->setParameters($params);
+        /** @var array<array{ 0: Link, category_aliases: string|null }> $result */
+        $result = $query->getResult();
 
         /** @var array<Link> */
-        return array_map(
-            fn (array $row): Link => $row[0]->setCategoryAliases($row['category_aliases']),
-            $query->getResult()
-        );
+        return array_map(fn (array $row): Link => $row[0]->setCategoryAliases($row['category_aliases']), $result);
     }
 }

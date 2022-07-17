@@ -79,9 +79,6 @@ class Link
         return $this->categories;
     }
 
-    /**
-     * @param array<string>|string $categoryAliases
-     */
     public function setCategoryAliases(mixed $categoryAliases): self
     {
         if (!is_array($categoryAliases)) {

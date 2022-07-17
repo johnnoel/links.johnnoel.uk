@@ -44,9 +44,4 @@ class LinksController extends AbstractController
             'form_type' => 'Create',
         ]);
     }
-
-    public function update(Request $request): Response
-    {
-
-    }
 }

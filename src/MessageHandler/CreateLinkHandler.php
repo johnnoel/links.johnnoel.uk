@@ -25,6 +25,7 @@ class CreateLinkHandler
         private readonly TagRepository $tagRepository,
         MessageBusInterface $messageBus
     ) {
+        $this->messageBus = $messageBus;
     }
 
     public function __invoke(CreateLink $message): Link
