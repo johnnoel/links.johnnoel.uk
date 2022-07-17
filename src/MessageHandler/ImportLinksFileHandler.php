@@ -55,7 +55,7 @@ class ImportLinksFileHandler
             $created = DateTimeImmutable::createFromFormat(DateTimeInterface::RFC3339_EXTENDED, $record['created']);
             $title = html_entity_decode($record['title']);
 
-            $link = new Link($url, [ $this->getCategory($record['folder']) ], $tags);
+            $link = new Link($url, [ $this->getCategory($record['folder']) ], $tags, true);
             $link->attachMetadata(new LinkMetadata($link, $title, $record['description']));
 
             if ($created !== false) {
