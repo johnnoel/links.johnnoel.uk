@@ -16,6 +16,11 @@ use Ramsey\Uuid\Uuid;
 #[ORM\Table(name: 'links')]
 class Link
 {
+    /**
+     * @var array<string>
+     */
+    #[Serializer\Exclude]
+    public array $categoryAliases = [];
     #[ORM\Id]
     #[ORM\Column(type: 'guid')]
     private string $id;
@@ -72,6 +77,20 @@ class Link
     public function getCategories(): Collection
     {
         return $this->categories;
+    }
+
+    /**
+     * @param array<string>|string $categoryAliases
+     */
+    public function setCategoryAliases(mixed $categoryAliases): self
+    {
+        if (!is_array($categoryAliases)) {
+            $categoryAliases = array_filter(array_map('trim', explode(',', strval($categoryAliases))));
+        }
+
+        $this->categoryAliases = $categoryAliases;
+
+        return $this;
     }
 
     public function overrideCreated(DateTimeImmutable $created): void

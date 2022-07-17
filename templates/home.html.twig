@@ -3,9 +3,10 @@
 {% block body %}
     <h1>links.johnnoel.uk</h1>
 
-    {% if links|length > 0 %}
+    {% for category in categories %}
+        <h2>{{ category.name }}</h2>
         <ul>
-            {% for link in links %}
+            {% for link in links|filter(l => category.slug in l.categoryAliases) %}
                 <li>
                     <a href="{{ link.url }}" rel="nofollow noopener">{{ link.title|default(link.url) }}</a>{% if link.title is not empty %} ({{ link.domain }}){% endif %}
                     {% if link.description is not empty %}
@@ -17,7 +18,20 @@
                 </li>
             {% endfor %}
         </ul>
-    {% else %}
-        <div>No links currently available</div>
-    {% endif %}
+    {% endfor %}
+
+    <h2>Uncategorised</h2>
+    <ul>
+        {% for link in links|filter(l => l.categoryAliases|length == 0) %}
+            <li>
+                <a href="{{ link.url }}" rel="nofollow noopener">{{ link.title|default(link.url) }}</a>{% if link.title is not empty %} ({{ link.domain }}){% endif %}
+                {% if link.description is not empty %}
+                    <br>{{ link.description }}
+                {% endif %}
+                {% if not link.public %}
+                    <div><span>private</span></div>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock body %}

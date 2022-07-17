@@ -126,6 +126,7 @@ class ApiControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $category = CategoryFactory::createOne();
+        $link = LinkFactory::createOne([ 'isPublic' => true, 'categories' => [ $category ]]);
 
         $client->request('GET', '/api/1/categories');
 

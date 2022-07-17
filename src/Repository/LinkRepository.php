@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Link;
+use App\Entity\LinkMetadata;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -35,19 +38,45 @@ class LinkRepository extends ServiceEntityRepository
      */
     public function fetchLinks(bool $publicOnly = true): array
     {
-        $qb = $this->createQueryBuilder('l');
-        $qb->addSelect([ 'lm' ])
-            ->leftJoin('l.metadata', 'lm')
-            ->orderBy('l.created', 'DESC')
-        ;
+        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm->addRootEntityFromClassMetadata(Link::class, 'l');
+        $rsm->addJoinedEntityFromClassMetadata(LinkMetadata::class, 'lm', 'l', 'metadata', [ 'id' => 'metadata_id' ]);
+        $rsm->addScalarResult('category_aliases', 'category_aliases');
+        $selectClause = $rsm->generateSelectClause([
+            'l' => 'l',
+            'lm' => 'lm',
+        ]);
+
+        $params = [];
+        $platform = $this->_em->getConnection()->getDatabasePlatform();
+        $aggMethod = ($platform instanceof SqlitePlatform) ? 'group_concat' : 'string_agg';
+        $sql = 'SELECT ' . $selectClause . ', ' . $aggMethod . '(c.slug, \',\') AS category_aliases
+            FROM links l
+            LEFT JOIN link_metadata lm ON lm.link_id = l.id
+            LEFT JOIN categories2links c2l ON c2l.link_id = l.id
+            LEFT JOIN categories c ON c.id = c2l.category_id
+        ';
 
         if ($publicOnly) {
-            $qb->where($qb->expr()->eq('l.isPublic', ':is_public'))
-                ->setParameter('is_public', true)
-            ;
+            $sql .= '
+                WHERE l.is_public = :is_public
+            ';
+
+            $params['is_public'] = true;
         }
 
+        $sql .= '
+            GROUP BY l.id, lm.id
+            ORDER BY l.created DESC
+        ';
+
+        $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query->setParameters($params);
+
         /** @var array<Link> */
-        return $qb->getQuery()->getResult();
+        return array_map(
+            fn (array $row): Link => $row[0]->setCategoryAliases($row['category_aliases']),
+            $query->getResult()
+        );
     }
 }

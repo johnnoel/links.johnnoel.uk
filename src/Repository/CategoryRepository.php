@@ -6,6 +6,7 @@ namespace App\Repository;
 
 use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -27,9 +28,37 @@ class CategoryRepository extends ServiceEntityRepository
     /**
      * @return array<Category>
      */
-    public function fetchCategories(): array
+    public function fetchCategories(bool $publicOnly = true): array
     {
-        return $this->findAll();
+        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm->addRootEntityFromClassMetadata(Category::class, 'c');
+        $rsm->addScalarResult('link_count', 'link_count');
+        $selectClause = $rsm->generateSelectClause('c', 'c');
+
+        $params = [];
+        $sql = 'SELECT ' . $selectClause . ', COUNT(c2l.link_id)
+            FROM categories c
+            JOIN categories2links c2l ON c2l.category_id = c.id
+        ';
+
+        if ($publicOnly) {
+            $sql .= '
+                JOIN links l ON l.id = c2l.link_id
+                WHERE l.is_public = :is_public
+            ';
+            $params['is_public'] = true;
+        }
+
+        $sql .= '
+            GROUP BY c.id
+            HAVING COUNT(c2l.link_id) > 0
+            ORDER BY c.name
+        ';
+
+        $query = $this->_em->createNativeQuery($sql, $rsm);
+        $query->setParameters($params);
+
+        return array_map(fn (array $row): Category => $row[0], $query->getResult());
     }
 
     /**
